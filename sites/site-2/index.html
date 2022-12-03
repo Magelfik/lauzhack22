@@ -67,9 +67,20 @@
         createApp({
             mounted(){
                 this.random();
+                this.getConnection().then(response => console.log(response.json()));
                 // new QRCode(document.getElementById("test"), "https://www.unige.ch");
             },
             methods: {
+                getConnection: function() {
+                    return fetch('http://localhost:8000/connection', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({"claims": ["birth"]})
+                    });
+                },
                 random: function(){
                     setInterval(function(){
                         let el = document.getElementById("total");
