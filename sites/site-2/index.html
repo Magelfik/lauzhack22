@@ -34,9 +34,12 @@
                                     <button type="button" class="inline-flex items-center rounded-md border
                                                 border-transparent bg-indigo-100 px-4 py-2 text-base font-medium
                                                 text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2
-                                                focus:ring-indigo-500 focus:ring-offset-2">
+                                                focus:ring-indigo-500 focus:ring-offset-2"
+                                            @click="getConnection" v-if="token.length === 0">
                                         Se connecter
                                     </button>
+
+                                    <div id="qrcode" class="mt-4"></div>
                                 </div>
                             </div>
                         </div>
@@ -67,12 +70,10 @@
         createApp({
             mounted(){
                 this.random();
-                this.getConnection().then(response => console.log(response.json()));
-                // new QRCode(document.getElementById("test"), "https://www.unige.ch");
             },
             methods: {
                 getConnection: function() {
-                    return fetch('http://localhost:8000/connection', {
+                    let req = fetch('http://localhost:8000/connection', {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -80,7 +81,27 @@
                         },
                         body: JSON.stringify({"claims": ["birth"]})
                     });
+
+                    req.then(response => response.json())
+                        .then(response => {
+                            this.token = response.token;
+                            new QRCode(document.getElementById("qrcode"), response.invitationUrl);
+                            this.runWebsockets();
+                        });
                 },
+
+                runWebsockets(){
+                    let ws = new WebSocket("ws://localhost:8000/verification/" + this.token + "/status");
+                    ws.onmessage = function(event) {
+                        var messages = document.getElementById('messages')
+                        var message = document.createElement('li')
+                        var content = document.createTextNode(event.data)
+                        message.appendChild(content)
+                        messages.appendChild(message)
+                    };
+                },
+
+                // UI Specific methods
                 random: function(){
                     setInterval(function(){
                         let el = document.getElementById("total");
@@ -90,6 +111,7 @@
             },
             data() {
                 return {
+                    token: "",
                     is_authed: false
                 }
             }
