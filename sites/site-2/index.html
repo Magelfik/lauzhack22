@@ -37,6 +37,7 @@
                                                 focus:ring-indigo-500 focus:ring-offset-2">
                                         Se connecter
                                     </button>
+                                    <div id="test"></div>
                                 </div>
                             </div>
                         </div>
@@ -60,12 +61,14 @@
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="../js/qrcode.min.js"></script>
     <script>
         const { createApp } = Vue
 
         createApp({
             mounted(){
                 this.random();
+                new QRCode(document.getElementById("test"), "https://www.unige.ch");
             },
             methods: {
                 random: function(){
