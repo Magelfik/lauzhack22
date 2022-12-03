@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black" id="app">
+<nav class="bg-gray-800">
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="relative flex h-16 items-center justify-between">
+            <div class="flex flex-1 sm:items-stretch sm:justify-start">
+                <div class="flex flex-shrink-0 items-center text-white text-xl">
+                    E-Voting
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div>
+    <div v-if="!is_authed">
+        <div class="absolute inset-0 top-14 flex justify-center items-center z-10 backdrop-blur-md">
+            <div class="relative z-10" role="dialog" aria-modal="true">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
+                <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+                    <div class="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden
+                            rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
+                        <div class="relative p-4">
+                            <h1 class="text-xl text-center p-4 items-center justify-center">
+                               Voter pour une 🇨🇭 meilleure 
+                            </h1>
+                            <div class="flex flex-col items-center">
+                                <button v-if="!loading" type="button" class="inline-flex items-center rounded-md border
+                                            border-transparent bg-indigo-100 px-4 py-2 text-base font-medium
+                                            text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2
+                                            focus:ring-indigo-500 focus:ring-offset-2" v-on:click="login">
+                                    Se connecter
+                                </button>
+                                <img v-else class="h-20" src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/04de2e31234507.564a1d23645bf.gif"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-else>
+        <div class="absolute inset-0 top-14 flex justify-center items-center z-10 backdrop-blur-md">
+            <div class="relative z-10" role="dialog" aria-modal="true">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
+                <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+                    <div class="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden
+                            rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
+                        <div class="relative p-4">
+                            <div class="flex flex-col">
+                                <label class="text-xl text-center p-4 items-center justify-center">Votation</label>
+                                <label class="text-center items-center justify-center">Bulletin de {{lastname}} {{surname}}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+</div>
+
+
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+    
+    async function get_data(){
+        //await new Promise(_ => setTimeout(_, 1000));
+        //return { "lastname": "TOTO", "surname": "POPO"};
+
+        let res = await new Promise(resolve => setTimeout( ()=>{ resolve({ "lastname": "POPO", "surname": "TOTO"}) }, 1000));
+        return res
+    }
+
+    const { createApp } = Vue
+
+    createApp({
+        data() {
+            return {
+                is_authed: false,
+                loading: false,
+                lastname: "",
+                surname: ""
+            }
+        },
+        methods: {
+            login(e) {
+                this.loading = true;
+                get_data().then((val)=>{
+                    this.lastname = val.lastname;
+                    this.surname = val.surname;
+                    this.is_authed = true;
+                })
+               
+            }
+        }
+    }).mount('#app')
+</script>
+</body>
+</html>
