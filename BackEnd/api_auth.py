@@ -3,6 +3,8 @@ import json
 from fastapi import FastAPI, WebSocket, Query
 from typing import List
 
+from starlette.middleware.cors import CORSMiddleware
+
 from routers.status import check_verification_status
 from shared import cache
 
@@ -14,6 +16,14 @@ DEFAULT_ATTRIBUTES: List[str] = ["birth"]
 
 
 app = FastAPI(debug=True)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(connection.router)
 app.include_router(test_route.router)
