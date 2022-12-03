@@ -32,4 +32,4 @@ async def get_verif_request():
 
 @app.websocket("/ws/verification/{token}/status")
 async def websocket_verification(websocket: WebSocket, token: str = Query(default=NULL_UUID, min_length=32, max_length=32)):
-    check_verification_status(websocket, token, cache)
+    await check_verification_status(websocket, token, cache)
