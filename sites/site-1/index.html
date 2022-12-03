@@ -5,101 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-    <body class="bg-black" id="app">
-        <nav class="bg-gray-800">
-            <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-                <div class="relative flex h-16 items-center justify-between">
-                    <div class="flex flex-1 sm:items-stretch sm:justify-start">
-                        <div class="flex flex-shrink-0 items-center text-white text-xl">
-                            SFWHub
+<body class="bg-black" id="app">
+<nav class="bg-gray-800">
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="relative flex h-16 items-center justify-between">
+            <div class="flex flex-1 sm:items-stretch sm:justify-start">
+                <div class="flex flex-shrink-0 items-center text-white text-xl">
+                    SFWHub
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<div>
+    <div v-if="!is_authed">
+        <div class="absolute inset-0 top-14 flex justify-center items-center z-10 backdrop-blur-md">
+            <div class="relative z-10" role="dialog" aria-modal="true">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
+                <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+                    <div class="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden
+                            rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
+                        <div class="relative p-4">
+                            <h1 class="text-xl text-center p-4 items-center justify-center">
+                                😱 Vous rentrez sur un affreux site pas pour adultes ! 😱
+                            </h1>
+                            <div class="flex flex-col items-center">
+                                <button type="button" class="inline-flex items-center rounded-md border
+                                            border-transparent bg-indigo-100 px-4 py-2 text-base font-medium
+                                            text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2
+                                            focus:ring-indigo-500 focus:ring-offset-2">
+                                    Se connecter
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </nav>
+        </div>
+    </div>
+    <div class="m-4 grid grid-cols-3 gap-4 justify-center place-items-center text-white">
         <div>
-            <div v-if="!is_authed">
-                
-            </div>
-            <div class="m-4 grid grid-cols-3 gap-4 justify-center place-items-center text-white">
-                <div>
-                    <img src="/img/1.jpeg" class="h-64 w-64" alt="">
-                    <p class="text-center">Un peu de musique</p>
-                </div>
-
-                <div>
-                    <img src="/img/2.jpeg" class="h-64 w-64" alt="">
-                    <p class="text-center">
-                        Journalisme
-                    </p>
-                </div>
-
-                <div>
-                    <img src="/img/3.jpeg" class="h-64 w-64" alt="">
-                    <p class="text-center">
-                        "Friendship is magic"
-                    </p>
-                </div>
-            </div>
-
-            <div class="m-4 grid grid-cols-3 gap-4 justify-center place-items-center text-white">
-                <div>
-                    <img src="/img/4.png" class="h-64 w-64" alt="">
-                    <p class="text-center">
-                        Déjeuner au lit
-                    </p>
-                </div>
-
-                <div>
-                    <img src="/img/5.jpeg" class="h-64 w-64" alt="">
-                    <p class="text-center">
-                        🎩
-                    </p>
-                </div>
-
-                <div>
-                    <img src="/img/6.jpeg" class="h-64 w-64" alt="">
-                    <p class="text-center">
-                        Le mécano
-                    </p>
-                </div>
-            </div>
-
-            <div class="m-4 grid grid-cols-3 gap-4 justify-center place-items-center text-white">
-                <div>
-                    <img src="/img/7.jpeg" class="h-64 w-64" alt="">
-                    <p class="text-center">
-
-                    </p>
-                </div>
-
-                <div>
-                    <img src="/img/8.jpeg" class="h-64 w-64" alt="">
-                    <p class="text-center">
-                        Alerte à maliboule
-                    </p>
-                </div>
-
-                <div>
-                    <img src="/img/9.jpeg" class="h-64 w-64" alt="">
-                    <p class="text-center">
-                        🎶
-                    </p>
-                </div>
-            </div>
+            <img src="/img/1.jpeg" class="h-64 w-64" alt="">
+            <p class="text-center">Un peu de musique</p>
         </div>
 
-        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-        <script>
-            const { createApp } = Vue
+        <div>
+            <img src="/img/2.jpeg" class="h-64 w-64" alt="">
+            <p class="text-center">
+                Journalisme
+            </p>
+        </div>
 
-            createApp({
-                data() {
-                    return {
-                        is_authed: false
-                    }
-                }
-            }).mount('#app')
-        </script>
-    </body>
+        <div>
+            <img src="/img/3.jpeg" class="h-64 w-64" alt="">
+            <p class="text-center">
+                "Friendship is magic"
+            </p>
+        </div>
+    </div>
+
+    <div class="m-4 grid grid-cols-3 gap-4 justify-center place-items-center text-white">
+        <div>
+            <img src="/img/4.png" class="h-64 w-64" alt="">
+            <p class="text-center">
+                Déjeuner au lit
+            </p>
+        </div>
+
+        <div>
+            <img src="/img/5.jpeg" class="h-64 w-64" alt="">
+            <p class="text-center">
+                🎩
+            </p>
+        </div>
+
+        <div>
+            <img src="/img/6.jpeg" class="h-64 w-64" alt="">
+            <p class="text-center">
+                Le mécano
+            </p>
+        </div>
+    </div>
+
+    <div class="m-4 grid grid-cols-3 gap-4 justify-center place-items-center text-white">
+        <div>
+            <img src="/img/7.jpeg" class="h-64 w-64" alt="">
+            <p class="text-center">
+
+            </p>
+        </div>
+
+        <div>
+            <img src="/img/8.jpeg" class="h-64 w-64" alt="">
+            <p class="text-center">
+                Alerte à maliboule
+            </p>
+        </div>
+
+        <div>
+            <img src="/img/9.jpeg" class="h-64 w-64" alt="">
+            <p class="text-center">
+                🎶
+            </p>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+    const { createApp } = Vue
+
+    createApp({
+        data() {
+            return {
+                is_authed: false
+            }
+        }
+    }).mount('#app')
+</script>
+</body>
 </html>
