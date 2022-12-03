@@ -35,10 +35,7 @@ async def check_verification_status(websocket: WebSocket, token: str, cache: Exp
     while req != "VERIFIED":
         req = get(
             f"http://localhost:8081/verify/process/{process_id}/state").json()
+    await websocket.send_json({"status": "verification passed"})
     claims = get(
         f"http://localhost:8081/verify/process/{process_id}/claims").json()
-    print(f"coucou {claims}")
     await websocket.send_json(claims)
-
-
-
