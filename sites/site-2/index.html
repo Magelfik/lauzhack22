@@ -37,7 +37,6 @@
                                                 focus:ring-indigo-500 focus:ring-offset-2">
                                         Se connecter
                                     </button>
-                                    <div id="test"></div>
                                 </div>
                             </div>
                         </div>
@@ -68,7 +67,7 @@
         createApp({
             mounted(){
                 this.random();
-                new QRCode(document.getElementById("test"), "https://www.unige.ch");
+                // new QRCode(document.getElementById("test"), "https://www.unige.ch");
             },
             methods: {
                 random: function(){
