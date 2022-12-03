@@ -17,4 +17,6 @@ def get_verif_request():
 
 @app.get("/verification/status/")
 def get_verif_status(token: str = Query(default=NULL_UUID, min_length=32, max_length=32)):
+
+    post("http://localhost:8081/verify/process", ...)
     pass
