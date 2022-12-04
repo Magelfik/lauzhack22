@@ -1,9 +1,10 @@
 <!doctype html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <title>NAB - NotABoulard</title>
 </head>
 <body class="bg-black" id="app">
 <nav class="bg-gray-800">
@@ -18,14 +19,14 @@
     </div>
 </nav>
 <div>
-    <div v-if="!is_authed">
+    <div v-if="!auth.is_authed">
         <div class="absolute inset-0 top-14 flex justify-center items-center z-10 backdrop-blur-md">
             <div class="relative z-10" role="dialog" aria-modal="true">
                 <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
                 <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
                     <div class="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden
                                 rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
-                        <div class="relative p-4" v-if="!is_denied">
+                        <div class="relative p-4" v-if="!auth.is_denied">
                             <h1 class="text-xl text-center p-4 items-center justify-center">
                                 😱 Vous rentrez sur un affreux site pas pour adultes ! 😱
                             </h1>
@@ -136,11 +137,9 @@
         data() {
             return {
                 CLAIMS: ['birth'],
-                first_name: "",
                 token: "",
                 // AUTH
-                is_authed: false,
-                is_denied: false,
+                auth: new AuthenticationStatus(),
 
                 error: false
             }
@@ -182,10 +181,11 @@
                 let today = new Date();
                 let birth_raw = data.birth.split(".");
                 let birth = new Date(birth_raw[2], birth_raw[1] - 1, birth_raw[0]);
+
                 let age = today.getFullYear() - birth.getFullYear();
                 let m = today.getMonth() - birth.getMonth();
 
-                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
                     age--;
                 }
 
@@ -198,9 +198,9 @@
              */
             has_right_to_visit_website(payload){
                 if (this.is_adult(payload)){
-                    this.is_authed = true;
+                    this.auth.is_authed = true;
                 } else {
-                    this.is_denied = true;
+                    this.auth.is_denied = true;
                 }
             }
         }

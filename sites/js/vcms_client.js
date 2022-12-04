@@ -37,8 +37,12 @@ function init_websocket(token, claims, on_success, on_error){
 
 class AuthenticationStatus {
     constructor() {
-        this.authed = false;
-        this.denied = false;
+        this.is_authed = false;
+        this.is_denied = false;
+        this.is_working = false;
+
+        this.error = false;
+
         this.message = "";
     }
 }
