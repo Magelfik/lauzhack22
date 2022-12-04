@@ -34,3 +34,11 @@ function init_websocket(token, claims, on_success, on_error){
         }
     };
 }
+
+class AuthenticationStatus {
+    constructor() {
+        this.authed = false;
+        this.denied = false;
+        this.message = "";
+    }
+}
