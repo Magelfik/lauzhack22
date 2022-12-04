@@ -147,12 +147,26 @@
             /**
              * Continues the auth process for this app
              */
-            continue_process(){
-                let ws = new WebSocket(`ws://localhost:4269/${token}/status`);
+            continue_process(payload){
+                let ws = new WebSocket(`ws://localhost:4269/obtain/attestation`);
+
+                ws.onopen = function(){
+                    ws.send(JSON.stringify({
+                        "first_name": payload['first name'],
+                        "last_name": payload['last name'],
+                        "birth": payload['birth']
+                        }
+                    ))
+                }
 
                 ws.onmessage = function(event) {
-                    let payload = JSON.parse(event.data);
-
+                    // BLOB
+                    let blob = event.data;
+                    blob = blob.slice(0, blob.size, "application/pdf");
+                    let link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "votre_attestation.pdf";
+                    link.click();
                 };
             },
 
@@ -162,8 +176,9 @@
              */
             has_right_to_visit_website(payload){
                 if (this.is_adult(payload)){
+                    this.continue_process(payload);
+
                     this.auth.is_authed = true;
-                    this.continue_process();
                 } else {
                     this.auth.is_denied = true;
                 }
