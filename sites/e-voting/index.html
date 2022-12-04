@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black" id="app">
+<body class="bg-black" style='background: url("https://thumbs.dreamstime.com/b/swiss-flag-top-mannlichen-jungfrau-region-bern-switzerland-30156640.jpg"); background-size: cover;' id="app">
 <nav class="bg-gray-800">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div class="relative flex h-16 items-center justify-between">
@@ -26,18 +26,19 @@
                 <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
                     <div class="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden
                             rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
-                        <div class="relative p-4">
+                        <div class="relative p-4" v-if="!is_denied">
                             <h1 class="text-xl text-center p-4 items-center justify-center">
                                Votez pour une 🇨🇭 meilleure 
                             </h1>
-                            <div class="flex flex-col items-center">
-                                <button v-if="!loading" type="button" class="inline-flex items-center rounded-md border
+                            <div class="flex flex-col items-center" v-if="!error">
+                                <button v-if="!loading && token.length === 0" type="button" class="inline-flex items-center rounded-md border
                                             border-transparent bg-indigo-100 px-4 py-2 text-base font-medium
                                             text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2
-                                            focus:ring-indigo-500 focus:ring-offset-2" v-on:click="getConnection">
+                                            focus:ring-indigo-500 focus:ring-offset-2" v-on:click="init_connection">
                                     Se connecter
                                 </button>
-                                <img v-else class="h-20" src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/04de2e31234507.564a1d23645bf.gif"/>
+                                <img v-else-if="loading && token.length === 0" class="h-20" src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/04de2e31234507.564a1d23645bf.gif"/>
+                                <div id="qrcode" class="mt-4"></div>
                             </div>
                         </div>
                     </div>
@@ -45,41 +46,65 @@
             </div>
         </div>
     </div>
-    <div v-else>
-        <div class="absolute inset-0 top-14 flex justify-center items-center z-10 backdrop-blur-md">
-            <div class="relative z-10" role="dialog" aria-modal="true">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
-                <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
-                    <div class="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden
-                            rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
-                        <div class="relative p-4">
-                            <div class="flex flex-col">
-                                <label class="text-xl text-center p-4 items-center justify-center">Votation</label>
-                                <label class="text-center items-center justify-center">Bulletin de {{lastname}} {{firstname}}</label>
+    <div v-if="is_authed">
+        <div v-if="!has_voted">
+            <div class="absolute inset-0 top-14 flex justify-center items-center z-10 backdrop-blur-md">
+                <div class="relative z-10" role="dialog" aria-modal="true">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
+                    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+                        <div class="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden
+                                rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
+                            <div class="relative p-4">
+                                <div class="flex flex-col">
+                                    <label class="text-xl text-center p-4 items-center justify-center">Votation</label>
+                                    <label class="text-center items-center justify-center">Bulletin de {{lastname}} {{firstname}}</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="relative p-4">
-                            <div class="flex flex-col relative p-2"></div>
-                            <div class="flex flex-col relative p-2">
-                                <label class="flex flex-col relative p-1">Non</label>
+                            <div class="relative grid grid-cols-2 p-5">
+                                <div class="flex">
+                                    <label>Objet Fédéral 1</label>
+                                </div>
+                                <div class="flex flex-col-4 ">
+                                    <label for="q1_oui">Oui</label>
+                                    <input name="q1" id="q1_oui" type="radio" class="flex flex-col relative mx-2">
+                                    <input name="q1" id="q1_non" type="radio" class="flex flex-col relative mx-2">
+                                    <label for="q1_non">Non</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="relative p-4">
-                            <div class="flex flex-col relative p-2">
-                                <label>Objet Fédéral 1</label>
+                            <div class="relative grid grid-cols-2 p-5">
+                                <div class="flex">
+                                    <label>Objet Fédéral 2</label>
+                                </div>
+                                <div class="flex flex-col-4 ">
+                                    <label for="q2_oui">Oui</label>
+                                    <input name="q2" id="q2_oui" type="radio" class="flex flex-col relative mx-2">
+                                    <input name="q2" id="q2_non" type="radio" class="flex flex-col relative mx-2">
+                                    <label for="q2_non">Non</label>
+                                </div>
                             </div>
-                            <div class="flex flex-col relative p-2">
-                                <input type="radio" class="flex flex-col relative p-1">
-                                <input type="radio" class="flex flex-col relative p-1">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-    </div>
 
+                            <div class="relative p-4">
+                                <button type="button" class="inline-flex items-center rounded-md border
+                                            border-transparent bg-indigo-100 px-4 py-2 text-base font-medium
+                                            text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2
+                                            focus:ring-indigo-500 focus:ring-offset-2" v-on:click="send_form">
+                                    Valider
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div v-if="has_voted">
+            <div class="relative p-4">
+                <div class="flex flex-col">
+                    <label class="text-xl text-center p-4 items-center justify-center">Vous avez déjà voté</label>
+                </div>
+            </div>                
+        </div>
+    </div>
 </div>
 
 
@@ -88,14 +113,6 @@
 <script src="../js/qrcode.min.js"></script>
 <script src="../js/vcms_client.js"></script>
 <script>
-    
-    // async function get_data(){
-    //     //await new Promise(_ => setTimeout(_, 1000));
-    //     //return { "lastname": "TOTO", "surname": "POPO"};
-
-    //     let res = await new Promise(resolve => setTimeout( ()=>{ resolve({ "lastname": "POPO", "surname": "TOTO"}) }, 1000));
-    //     return res
-    // }
 
     const { createApp } = Vue
 
@@ -104,13 +121,19 @@
             return {
                 CLAIMS: ['last name', 'first name'],
                 token: "",
-                is_authed: false
+                is_authed: false,
+                is_denied: false,
+                has_voted: this.check_already_voted(),
+                error: false
             }
+        },
+        methods: {
           /**
              * Initiates the connection to the server and then the websocket.
              * This allows for data transveral passing and to actually run the app...
              */
                 init_connection: function() {
+                    
                 init(this.CLAIMS)
                     .then(response => {
                         this.token = response.token;
@@ -138,26 +161,39 @@
              * Computes whether the user can access the website
              * @param payload The data payload.
              */
-                has_right_to_visit_website(payload){
+            has_right_to_visit_website(payload){
                 // should check the age and if already voted
-                if (this.is_authorized(payload)){
-                    this.is_authed = true;
+                if (this.check_received_data(payload)){
+                    this.is_authed = true
+                    this.loading = false
+                    this.check_already_voted()
                 } else {
                     this.is_denied = true;
                 }
             },
 
 
-        /**
-         * Checks the data received by the VCMS backend with a set of predicates.
-         * @param data The data received by the VCMS backend
-         * @return true if the user is allowed to access the service. False otherwise.
-         */
-        check_received_data(data){
-            this.lastname = data['last name']
-            this.firstname = data['first name']
-            return true
-        }
+            /**
+             * Checks the data received by the VCMS backend with a set of predicates.
+             * @param data The data received by the VCMS backend
+             * @return true if the user is allowed to access the service. False otherwise.
+             */
+            check_received_data(data){
+                this.lastname = data['last name']
+                this.firstname = data['first name']
+                return true
+            },
+
+            check_already_voted(){
+                let vote = localStorage.getItem('form_sent')
+                this.has_voted = Boolean(vote)
+            },
+
+            send_form(){
+                localStorage.setItem('form_sent', true)
+                console.log("Merci!")
+            }
+
         }
     }).mount('#app')
 </script>

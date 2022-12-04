@@ -26,7 +26,7 @@ function init_websocket(token, claims, on_success, on_error){
 
     ws.onmessage = function(event) {
         let payload = JSON.parse(event.data);
-
+        
         if (claims.every(claim => payload.hasOwnProperty(claim))){
             on_success(payload);
         } else if (payload.hasOwnProperty('error')){
