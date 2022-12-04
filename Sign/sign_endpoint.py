@@ -44,11 +44,11 @@ async def websocket_attestation(websocket: WebSocket):
             sig_field_name="Signature", on_page=0, box=(0, 0, 595, 500)))
         w.write_in_place()
         with open(f"tmp/{filename}_signed.pdf", 'wb') as out_doc:
-            signers.sign_pdf(
+            await signers.async_sign_pdf(
                 w, signers.PdfSignatureMetadata(field_name='Signature'),
                 signer=cms_signer, output=out_doc
             )
 
-            payload = out_doc.readall()
-
+    with open(f"tmp/{filename}_signed.pdf", 'rb') as signed:
+        payload = signed.read()
     await websocket.send_bytes(payload)
