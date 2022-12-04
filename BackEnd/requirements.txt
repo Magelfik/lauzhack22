@@ -2,3 +2,4 @@ requests
 fastapi
 expiring-dict
 websockets
+uvicorn
