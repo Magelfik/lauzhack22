@@ -15,9 +15,9 @@ router = APIRouter(
 
 async def check_verification_status(websocket: WebSocket, token: str, cache: ExpiringDict):
     data: dict = cache.pop(token, {})
-    if data == {}:
-        raise WebSocketDisconnect(code=status.WS_1002_PROTOCOL_ERROR)
     await websocket.accept()
+    if data == {}:
+        raise WebSocketDisconnect(code=status.WS_1002_PROTOCOL_ERROR, reason="Invalid token for authentication")
     req = "created"
     i = 0
     while req != "responded" and i < DEFAULT_TIMEOUT:

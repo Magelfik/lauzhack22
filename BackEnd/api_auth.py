@@ -1,6 +1,7 @@
 import json
+from time import sleep
 
-from fastapi import FastAPI, WebSocket, Query
+from fastapi import FastAPI, WebSocket, Query, WebSocketDisconnect
 
 from starlette.middleware.cors import CORSMiddleware
 
@@ -30,4 +31,7 @@ def get_root():
 
 @app.websocket("/{token}/status")
 async def websocket_verification(websocket: WebSocket, token: str = Query(default=NULL_UUID, min_length=32, max_length=32)):
-    await check_verification_status(websocket, token, cache)
+    try:
+        await check_verification_status(websocket, token, cache)
+    except WebSocketDisconnect as wsds:
+        await websocket.close(wsds.code, wsds.reason)
