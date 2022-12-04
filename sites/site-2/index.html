@@ -79,26 +79,56 @@
                             'Accept': 'application/json',
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({"claims": ["birth"]})
+                        body: JSON.stringify({"claims": this.CLAIMS})
                     });
 
                     req.then(response => response.json())
                         .then(response => {
                             this.token = response.token;
-                            new QRCode(document.getElementById("qrcode"), response.invitationUrl);
+                            new QRCode(document.getElementById("qrcode"), {
+                                text: response.invitationUrl,
+                                width: 512,
+                                height: 512
+                            });
+                            // We can continue with the auth process
                             this.runWebsockets();
                         });
                 },
 
                 runWebsockets(){
-                    let ws = new WebSocket("ws://localhost:8000/verification/" + this.token + "/status");
+                    let ws = new WebSocket("ws://localhost:8000/" + this.token + "/status");
+                    let self = this;
+
                     ws.onmessage = function(event) {
-                        var messages = document.getElementById('messages')
-                        var message = document.createElement('li')
-                        var content = document.createTextNode(event.data)
-                        message.appendChild(content)
-                        messages.appendChild(message)
+                        let payload = JSON.parse(event.data);
+
+                        if (self.CLAIMS.every(claim => payload.hasOwnProperty(claim))){
+                            if (self.check_received_data(payload)){
+                                self.is_authed = true;
+                            }
+                        } else if (payload.hasOwnProperty('error')){
+                            self.error = true;
+                        }
                     };
+                },
+
+                /**
+                 * Checks the data received by the VCMS backend with a set of predicates.
+                 * @param data The data received by the VCMS backend
+                 * @return true if the user is allowed to access the service. False otherwise.
+                 */
+                check_received_data(data){
+                    let today = new Date();
+                    let birth_raw = data.birth.split(".");
+                    let birth = new Date(birth_raw[0], birth_raw[1] - 1, birth_raw[2]);
+                    let age = today.getFullYear() - birth.getFullYear();
+                    let m = today.getMonth() - birth.getMonth();
+
+                    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+
+                    return age >= 18;
                 },
 
                 // UI Specific methods
@@ -111,8 +141,11 @@
             },
             data() {
                 return {
+                    CLAIMS: ['birth'],
+
                     token: "",
-                    is_authed: false
+                    is_authed: false,
+                    error: true
                 }
             }
         }).mount('#app')
