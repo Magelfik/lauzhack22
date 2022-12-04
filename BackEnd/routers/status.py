@@ -33,7 +33,7 @@ async def check_verification_status(websocket: WebSocket, token: str, cache: Exp
             f"http://localhost:8080/connection/{data['connectionId']}").json()
         i += 1
     if i >= DEFAULT_TIMEOUT:
-        await websocket.send_json({"status": "error : timeout"})
+        await websocket.send_json({{"error": "timeout"}})
     else:
         await websocket.send_json({"status": "connexion established with client"})
         payload: dict = {"connectionId": data['connectionId'],
@@ -49,7 +49,7 @@ async def check_verification_status(websocket: WebSocket, token: str, cache: Exp
                 f"http://localhost:8081/verify/process/{process_id}/state").json()
             i += 1
         if i >= DEFAULT_TIMEOUT:
-            await websocket.send_json({"status": "error : timeout"})
+            await websocket.send_json({"error": "timeout"})
         else:
             await websocket.send_json({"status": "verification passed"})
             claims = get(
