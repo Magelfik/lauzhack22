@@ -1,3 +1,3 @@
 # LauzHack 2022
 
-Unige quoi
+Adnovum challenge 2022
