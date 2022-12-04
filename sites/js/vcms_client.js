@@ -22,7 +22,7 @@ function init(claims){
  * @param on_error The on error callback. Will be called otherwise.
  */
 function init_websocket(token, claims, on_success, on_error){
-    let ws = new WebSocket("ws://localhost:8000/" + token + "/status");
+    let ws = new WebSocket(`ws://localhost:8000/${token}/status`);
 
     ws.onmessage = function(event) {
         let payload = JSON.parse(event.data);
