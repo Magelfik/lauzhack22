@@ -1,3 +1,4 @@
 requests
 fastapi
 expiring-dict
+websockets
