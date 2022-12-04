@@ -107,9 +107,16 @@
                  */
                 init_connection: function() {
                     this.auth.is_working = true;
-                    init(this.CLAIMS)
+                    fetch('http://localhost:6969/connection', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({"claims": this.CLAIMS})
+                    }).then(response => response.json())
                         .then(response => {
-                            this.token = response.token;
+                            let token = response.token;
 
                             new QRCode(document.getElementById("qrcode"), {
                                 text: response.invitationUrl,
@@ -119,8 +126,13 @@
 
                             // We can continue with the auth process
                             this.auth.is_working = false;
-                            this.runWebsockets();
-                        })
+
+                            let ws = new WebSocket(`ws://localhost:6969/${token}/status`);
+
+                            ws.onmessage = function(event) {
+                                console.log(event);
+                            };
+                        });
                 },
 
                 /**
@@ -138,24 +150,6 @@
                     this.first_name = payload['first name'];
                     this.last_name = payload['last name'];
                     this.auth.is_authed = true;
-
-                    fetch('http://localhost:6969/connection', {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({"claims": this.CLAIMS})
-                    }).then(response => response.json())
-                        .then(response => {
-                            let token = response.token;
-
-                            let ws = new WebSocket(`ws://localhost:6969/${token}/status`);
-
-                            ws.onmessage = function(event) {
-                                console.log(event);
-                            };
-                    });
                 }
             }
         }).mount('#app')
