@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Pokère, pokère !</title>
+</head>
+<body class="bg-black" id="app">
+    <nav class="bg-gray-800">
+        <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <div class="relative flex h-16 items-center justify-between">
+                <div class="flex flex-1 sm:items-stretch sm:justify-start">
+                    <div class="flex flex-shrink-0 items-center text-white text-xl">
+                        OPM Insurances
+                    </div>
+                </div>
+                <div class="relative ml-3 text-white" v-if="auth.is_authed">
+                    Bonjour {{ first_name }} {{ last_name }}
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div>
+        <div v-if="!auth.is_authed">
+            <div class="absolute inset-0 top-14 flex justify-center items-center z-10 backdrop-blur-md">
+                <div class="relative z-10" role="dialog" aria-modal="true">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
+                    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+                        <div class="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden
+                                rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
+                            <div class="relative p-4" v-if="!auth.is_denied">
+                                <h1 class="text-xl text-center p-4 items-center justify-center">
+                                    Connectez-vous pour obtenir votre carte d'assuré.e.
+                                </h1>
+                                <div class="flex flex-col items-center" v-if="!error">
+                                    <button type="button" class="inline-flex items-center rounded-md border
+                                        border-transparent bg-indigo-100 px-4 py-2 text-base font-medium
+                                        text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2
+                                        focus:ring-indigo-500 focus:ring-offset-2"
+                                            @click="init_connection" v-if="token.length === 0">
+
+                                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" v-if="auth.is_working"
+                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                    stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0
+                                                0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3
+                                                7.938l3-2.647z">
+                                            </path>
+                                        </svg>
+
+                                        Se connecter
+                                    </button>
+
+                                    <div id="qrcode" class="mt-4"></div>
+                                </div>
+                                <div v-else>
+                                    <p class="text-red">
+                                        Désolé, une erreur s'est produite. Veuillez contacter notre support au
+                                        <a href="tel://+41787244796">+41 78 724 47 96</a>.
+                                    </p>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <h1 class="text-xl text-center p-4 items-center justify-center">
+                                    Vous n'êtes malheureusement pas en mesure d'accéder à notre site web.
+                                    {{ auth.message }}
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="m-4 mt-12 grid gap-4 justify-center place-items-center text-white">
+            Scannez et acceptez votre carte d'assuré.e dans votre wallet. Merci !
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="../js/qrcode.min.js"></script>
+    <script src="../js/vcms_client.js"></script>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    CLAIMS: ['first name', 'last name', 'birth'],
+                    first_name: "",
+                    last_name: "",
+                    token: "",
+                    // AUTH
+                    auth: new AuthenticationStatus(),
+
+                    error: false
+                }
+            },
+            methods: {
+                /**
+                 * Initiates the connection to the server and then the websocket.
+                 * This allows for data transveral passing and to actually run the app...
+                 */
+                init_connection: function() {
+                    this.auth.is_working = true;
+                    init(this.CLAIMS)
+                        .then(response => {
+                            this.token = response.token;
+
+                            new QRCode(document.getElementById("qrcode"), {
+                                text: response.invitationUrl,
+                                width: 400,
+                                height: 400
+                            });
+
+                            // We can continue with the auth process
+                            this.auth.is_working = false;
+                            this.runWebsockets();
+                        })
+                },
+
+                /**
+                 * Runs the websockets to discuss with the backend and the passport.
+                 */
+                runWebsockets(){
+                    init_websocket(this.token, this.CLAIMS, this.has_right_to_visit_website, () => {this.error = true;})
+                },
+
+                /**
+                 * Computes whether the user can access the website
+                 * @param payload The data payload.
+                 */
+                has_right_to_visit_website(payload){
+                    this.first_name = payload['first name'];
+                    this.last_name = payload['last name'];
+                    this.auth.is_authed = true;
+
+                    fetch('http://localhost:6969/connection', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({"claims": this.CLAIMS})
+                    }).then(response => response.json())
+                        .then(response => {
+                            let token = response.token;
+                            let ws = new WebSocket(`ws://localhost:6969/${token}/status`);
+
+                            ws.onmessage = function(event) {
+                                console.log(event);
+                            };
+                    });
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
