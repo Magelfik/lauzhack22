@@ -166,7 +166,7 @@
                  * @param payload The data payload.
                  */
                 has_right_to_visit_website(payload){
-                    const banned = [34288134];
+                    const banned = ["34288134"];
                     if (this.is_adult(payload)){
                         if (banned.includes(payload.uid)){
                             this.auth.is_denied = true;
