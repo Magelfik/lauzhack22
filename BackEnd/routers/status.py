@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Query, WebSocket, status
+from fastapi import APIRouter, Query, WebSocket, status, WebSocketDisconnect
 from expiring_dict import ExpiringDict
 from requests import get, post
 from typing import List
 from time import sleep
-from websockets import WebSocketException
 
 from shared import DEFAULT_CREDENTIAL_VERIF, DEFAULT_PAUSE_TIME, DEFAULT_TIMEOUT
 
@@ -17,7 +16,7 @@ router = APIRouter(
 async def check_verification_status(websocket: WebSocket, token: str, cache: ExpiringDict):
     data: dict = cache.pop(token, {})
     if data == {}:
-        raise WebSocketException(code=status.WS_1002_PROTOCOL_ERROR)
+        raise WebSocketDisconnect(code=status.WS_1002_PROTOCOL_ERROR)
     await websocket.accept()
     req = "created"
     i = 0
