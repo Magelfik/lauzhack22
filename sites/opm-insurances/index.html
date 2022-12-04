@@ -76,6 +76,7 @@
 
         <div class="m-4 mt-12 grid gap-4 justify-center place-items-center text-white">
             Scannez et acceptez votre carte d'assuré.e dans votre wallet. Merci !
+            <div id="qrcode2"></div>
         </div>
     </div>
 
@@ -148,6 +149,7 @@
                     }).then(response => response.json())
                         .then(response => {
                             let token = response.token;
+
                             let ws = new WebSocket(`ws://localhost:6969/${token}/status`);
 
                             ws.onmessage = function(event) {
