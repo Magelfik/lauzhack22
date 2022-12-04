@@ -24,19 +24,33 @@
                 <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
                 <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
                     <div class="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden
-                            rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
-                        <div class="relative p-4">
+                                rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
+                        <div class="relative p-4" v-if="!is_denied">
                             <h1 class="text-xl text-center p-4 items-center justify-center">
                                 😱 Vous rentrez sur un affreux site pas pour adultes ! 😱
                             </h1>
-                            <div class="flex flex-col items-center">
+                            <div class="flex flex-col items-center" v-if="!error">
                                 <button type="button" class="inline-flex items-center rounded-md border
-                                            border-transparent bg-indigo-100 px-4 py-2 text-base font-medium
-                                            text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2
-                                            focus:ring-indigo-500 focus:ring-offset-2">
+                                                border-transparent bg-indigo-100 px-4 py-2 text-base font-medium
+                                                text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2
+                                                focus:ring-indigo-500 focus:ring-offset-2"
+                                        @click="init_connection" v-if="token.length === 0">
                                     Se connecter
                                 </button>
+
+                                <div id="qrcode" class="mt-4"></div>
                             </div>
+                            <div v-else>
+                                <p class="text-red">
+                                    Désolé, une erreur s'est produite. Veuillez contacter notre support au
+                                    <a href="tel://+41787244796">+41 78 724 47 96</a>.
+                                </p>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <h1 class="text-xl text-center p-4 items-center justify-center">
+                                Vous n'êtes malheureusement pas en mesure d'accéder à notre site web.
+                            </h1>
                         </div>
                     </div>
                 </div>
@@ -113,13 +127,81 @@
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="../js/qrcode.min.js"></script>
+<script src="../js/vcms_client.js"></script>
+
 <script>
-    const { createApp } = Vue
+    const { createApp } = Vue;
 
     createApp({
         data() {
             return {
-                is_authed: false
+                CLAIMS: ['birth'],
+                first_name: "",
+                token: "",
+                // AUTH
+                is_authed: false,
+                is_denied: false,
+
+                error: false
+            }
+        },
+        methods: {
+            /**
+             * Initiates the connection to the server and then the websocket.
+             * This allows for data transveral passing and to actually run the app...
+             */
+            init_connection: function() {
+                init(this.CLAIMS)
+                    .then(response => {
+                        this.token = response.token;
+
+                        new QRCode(document.getElementById("qrcode"), {
+                            text: response.invitationUrl,
+                            width: 512,
+                            height: 512
+                        });
+
+                        // We can continue with the auth process
+                        this.runWebsockets();
+                    })
+            },
+
+            /**
+             * Runs the websockets to discuss with the backend and the passport.
+             */
+            runWebsockets(){
+                init_websocket(this.token, this.CLAIMS, this.has_right_to_visit_website, () => {this.error = true;})
+            },
+
+            /**
+             * Checks the data received by the VCMS backend with a set of predicates.
+             * @param data The data received by the VCMS backend
+             * @return true if the user is allowed to access the service. False otherwise.
+             */
+            is_adult(data){
+                let today = new Date();
+                let birth_raw = data.birth.split(".");
+                let birth = new Date(birth_raw[2], birth_raw[1] - 1, birth_raw[0]);
+                let age = today.getFullYear() - birth.getFullYear();
+                let m = today.getMonth() - birth.getMonth();
+
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                return age >= 18;
+            },
+
+            /**
+             * Computes whether the user can access the website
+             * @param payload The data payload.
+             */
+            has_right_to_visit_website(payload){
+                if (this.is_adult(payload)){
+                    this.is_authed = true;
+                } else {
+                    this.is_denied = true;
+                }
             }
         }
     }).mount('#app')

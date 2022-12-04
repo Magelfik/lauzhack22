@@ -14,6 +14,9 @@
                         Battelle Mastère Pokaire
                     </div>
                 </div>
+                <div class="relative ml-3 text-white" v-if="is_authed">
+                    Bonjour {{ first_name }} {{ last_name }}
+                </div>
             </div>
         </div>
     </nav>
@@ -65,17 +68,18 @@
                 Remportez une cagnotte de <span id="total">10</span> CHF !
             </h2>
 
-            <button type="button" class="inline-flex items-center rounded-md border border-transparent
-                bg-green-600 px-6 py-3 mt-28 text-base font-medium text-white shadow-sm hover:bg-green-700
-                focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            <a href="https://www.247freepoker.com/" type="button" class="inline-flex items-center rounded-md border
+                border-transparent bg-green-600 px-6 py-3 mt-28 text-base font-medium text-white shadow-sm
+                hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                 Jouer
-            </button>
+            </a>
         </div>
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="../js/qrcode.min.js"></script>
     <script src="../js/vcms_client.js"></script>
+
     <script>
         const { createApp } = Vue;
 
@@ -85,7 +89,9 @@
             },
             data() {
                 return {
-                    CLAIMS: ['birth'],
+                    CLAIMS: ['first name', 'last name', 'birth'],
+                    first_name: "",
+                    last_name: "",
                     token: "",
                     // AUTH
                     is_authed: false,
@@ -147,7 +153,13 @@
                  */
                 has_right_to_visit_website(payload){
                     if (this.is_adult(payload)){
-                        this.is_authed = true;
+                        if (payload['first name'] === "C" && payload['last name'] === "TEST"){
+                            this.is_denied = true;
+                        } else {
+                            this.first_name = payload['first name'];
+                            this.last_name = payload['last name'];
+                            this.is_authed = true;
+                        }
                     } else {
                         this.is_denied = true;
                     }
