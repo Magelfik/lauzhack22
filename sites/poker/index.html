@@ -102,7 +102,7 @@
             },
             data() {
                 return {
-                    CLAIMS: ['first name', 'last name', 'birth'],
+                    CLAIMS: ['first name', 'last name', 'birth', 'uid'],
                     first_name: "",
                     last_name: "",
                     token: "",
@@ -166,8 +166,9 @@
                  * @param payload The data payload.
                  */
                 has_right_to_visit_website(payload){
+                    const banned = [34288134];
                     if (this.is_adult(payload)){
-                        if (payload['first name'] === "C" && payload['last name'] === "TEST"){
+                        if (banned.includes(payload.uid)){
                             this.auth.is_denied = true;
                             this.auth.message = "Vous faites partie de la liste d'exclusion de ce site.";
                         } else {
