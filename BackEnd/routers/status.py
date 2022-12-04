@@ -4,14 +4,7 @@ from requests import get, post
 from typing import List
 from time import sleep
 
-from shared import cache
-
-NULL_UUID: str = "00000000000000000000000000000000"
-DEFAULT_CREDENTIAL_VERIF: str = "4HS52UpbxN8rHqCHWgtCSN:3:CL:63828:e-id"
-DEFAULT_ATTRIBUTES: List[str] = ["birth"]
-DEFAULT_PAUSE_TIME: float = 0.1
-DEFAULT_TIMEOUT: int = int(600/DEFAULT_PAUSE_TIME)  # timeout : ~600s ~ 10min
-
+from shared import DEFAULT_CREDENTIAL_VERIF, DEFAULT_PAUSE_TIME, DEFAULT_TIMEOUT
 
 router = APIRouter(
     prefix="/verification",

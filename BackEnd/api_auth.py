@@ -1,19 +1,13 @@
 import json
 
 from fastapi import FastAPI, WebSocket, Query
-from typing import List
 
 from starlette.middleware.cors import CORSMiddleware
 
 from routers.status import check_verification_status
-from shared import cache
+from shared import cache, NULL_UUID
 
-from routers import connection, test_route, status
-
-NULL_UUID: str = "00000000000000000000000000000000"
-DEFAULT_CREDENTIAL_VERIF: str = "4HS52UpbxN8rHqCHWgtCSN:2:e-id:1.0"
-DEFAULT_ATTRIBUTES: List[str] = ["birth"]
-
+from routers import connection, test_route
 
 app = FastAPI(debug=True)
 
